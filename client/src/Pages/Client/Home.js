@@ -32,23 +32,8 @@ const CHome = () => {
       }
     };
 
-    const fetchProposals = async () => {
-      setLoading(true); // Optional: You might want to set loading here too
-      try {
-        const response = await axios.get("/api/proposal/all");
-        if (response.status === 200) {
-          dispatch(addAllPropsal(response.data));
-        }
-      } catch (error) {
-        console.error("Error fetching proposals:", error);
-      } finally {
-        setLoading(false); // Ensure loading is set to false
-      }
-    };
-
     const fetchData = async () => {
       await fetchJobs();
-      await fetchProposals(); // Ensure you're calling the correct function
     };
 
     fetchData();

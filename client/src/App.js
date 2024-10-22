@@ -22,7 +22,7 @@ import PageTransitionWrapper from "./Components/PageTransitionWrapper"; // Impor
 import ScrollToTop from "./Components/ScrollTop";
 import EditProfile from "./Pages/FreeLancer/Profile";
 import axios from "axios";
-import { setUser, logout } from "./react-redux/store";
+import { setUser, logout, addAllPropsal } from "./react-redux/store";
 import Proposals from "./Pages/Client/Proposals";
 
 function App() {
@@ -54,7 +54,23 @@ function App() {
       } catch (error) {}
     };
 
-    fetchUser();
+    const fetchProposals = async () => {
+      try {
+        const response = await axios.get("/api/proposal/all");
+        if (response.status === 200) {
+          dispatch(addAllPropsal(response.data));
+        }
+      } catch (error) {
+        console.error("Error fetching proposals:", error);
+      } finally {
+      }
+    };
+
+    const fet = async () => {
+      await fetchUser();
+      await fetchProposals();
+    };
+    fet();
   }, [dispatch]);
 
   return (

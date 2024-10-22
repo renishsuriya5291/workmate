@@ -412,7 +412,7 @@ const JobCard = ({ job, handleLike, calculateTimeAgo }) => {
                         className="flex items-center bg-gray-100 p-2 rounded-md shadow-sm"
                       >
                         {renderFileIcon(file)}
-                        <span className="ml-2 text-gray-700 truncate w-1">
+                        <span className="ml-2 text-gray-700 truncate w-14">
                           {file.name}
                         </span>
                         <X

@@ -55,9 +55,7 @@ const getAll = async (req, res) => {
       const proposals = await Proposal.find({
         freelancer: req.user.id,
       }); // Populate freelancer details
-      if (!proposals || proposals.length === 0) {
-        return res.status(404).json({ message: "No proposals found" });
-      }
+
       return res.status(200).json(proposals);
     } else if (user.role === "client") {
       // Fetch jobs associated with the client
@@ -72,9 +70,7 @@ const getAll = async (req, res) => {
         "freelancer",
         "username experience profilePicture"
       );
-      if (!proposals || proposals.length === 0) {
-        return res.status(404).json({ message: "No proposals found" });
-      }
+
       return res.status(200).json(proposals);
     } else {
       return res.status(403).json({ message: "Unauthorized role" });

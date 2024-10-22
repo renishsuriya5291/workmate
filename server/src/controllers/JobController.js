@@ -202,9 +202,6 @@ const getAllJob = async (req, res) => {
       privacy: "public",
       status: { $ne: "closed" },
     });
-    if (!jobs) {
-      return res.status(404).json({ message: "not jobs not aviales" });
-    }
 
     res.status(200).json({ jobs: jobs });
   } catch (error) {

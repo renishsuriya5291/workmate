@@ -6,27 +6,27 @@ import {
   Search,
   Settings,
   User,
+  Frown, // Import an icon for no jobs
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Input from "../../Components/Input";
 import Button from "../../Components/Button";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import {
-  addAllJobs,
-  updateJob,
-  updateUser,
-  addAllPropsal,
-} from "../../react-redux/store";
+import { addAllJobs, updateJob, updateUser } from "../../react-redux/store";
 import JobCard from "../../Components/JobCard";
 
 const TabsContent = ({ children, isVisible }) =>
   isVisible ? <div className="mt-4">{children}</div> : null;
 
+const SkeletonLoader = () => (
+  <div className="animate-pulse bg-gray-200 rounded-lg h-32 mb-4"></div>
+);
+
 const FHome = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("best-matches");
-  const { jobs } = useSelector((state) => state.auth);
+  const { jobs, loading } = useSelector((state) => state.auth); // Assuming loading is part of the state
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
@@ -53,21 +53,7 @@ const FHome = () => {
         console.error("Error fetching jobs:", error);
       }
     };
-    const fetchProposals = async () => {
-      try {
-        const response = await axios.get("/api/proposal/all");
-        if (response.status === 200) {
-          dispatch(addAllPropsal(response.data));
-        }
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      }
-    };
-    const ft = async () => {
-      await fetchProposals();
-      await fetchJobs();
-    };
-    ft();
+    fetchJobs();
   }, [dispatch]);
 
   const calculateTimeAgo = (date) => {
@@ -138,25 +124,45 @@ const FHome = () => {
 
               <TabsContent isVisible={activeTab === "best-matches"}>
                 <div className="space-y-4 mt-4">
-                  {jobs.map((job) => (
-                    <JobCard
-                      key={job._id}
-                      job={job}
-                      user={user}
-                      handleLike={handleLike}
-                      calculateTimeAgo={calculateTimeAgo}
-                    />
-                  ))}
+                  {loading ? (
+                    // Display skeleton loaders while loading
+                    <>
+                      <SkeletonLoader />
+                      <SkeletonLoader />
+                      <SkeletonLoader />
+                    </>
+                  ) : jobs.length > 0 ? (
+                    jobs.map((job) => (
+                      <JobCard
+                        key={job._id}
+                        job={job}
+                        user={user}
+                        handleLike={handleLike}
+                        calculateTimeAgo={calculateTimeAgo}
+                      />
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-64">
+                      <Frown className="h-10 w-10 text-gray-500" />
+                      <p className="text-gray-600">No jobs available.</p>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent isVisible={activeTab === "most-recent"}>
                 <div className="space-y-4 mt-4">
-                  {jobs.filter((job) => {
-                    const jobPostedTime = new Date(job.createdAt);
-                    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-                    return jobPostedTime >= oneHourAgo;
-                  }).length > 0 ? (
+                  {loading ? (
+                    <>
+                      <SkeletonLoader />
+                      <SkeletonLoader />
+                      <SkeletonLoader />
+                    </>
+                  ) : jobs.filter((job) => {
+                      const jobPostedTime = new Date(job.createdAt);
+                      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+                      return jobPostedTime >= oneHourAgo;
+                    }).length > 0 ? (
                     jobs
                       .filter((job) => {
                         const jobPostedTime = new Date(job.createdAt);
@@ -175,14 +181,23 @@ const FHome = () => {
                         />
                       ))
                   ) : (
-                    <p className="text-gray-600">No posts available.</p>
+                    <div className="flex flex-col items-center justify-center h-64">
+                      <Frown className="h-10 w-10 text-gray-500" />
+                      <p className="text-gray-600">No jobs available.</p>
+                    </div>
                   )}
                 </div>
               </TabsContent>
 
               <TabsContent isVisible={activeTab === "liked"}>
                 <div className="space-y-4 mt-4">
-                  {user.likedJobs && user.likedJobs.length > 0 ? (
+                  {loading ? (
+                    <>
+                      <SkeletonLoader />
+                      <SkeletonLoader />
+                      <SkeletonLoader />
+                    </>
+                  ) : user.likedJobs && user.likedJobs.length > 0 ? (
                     user.likedJobs.map((likedJobId) => {
                       const job = jobs.find((job) => job._id === likedJobId);
                       return job ? (
@@ -196,7 +211,10 @@ const FHome = () => {
                       ) : null;
                     })
                   ) : (
-                    <p>No liked jobs found.</p>
+                    <div className="flex flex-col items-center justify-center h-64">
+                      <Frown className="h-10 w-10 text-gray-500" />
+                      <p className="text-gray-600">No liked jobs found.</p>
+                    </div>
                   )}
                 </div>
               </TabsContent>
@@ -280,7 +298,6 @@ const FHome = () => {
             </div>
           </div>
         </div>
-        {/* Modal */}
       </main>
     </div>
   );

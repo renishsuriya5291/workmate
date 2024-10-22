@@ -1,9 +1,26 @@
 import React from "react";
-import { DollarSign, Clock } from "lucide-react"; // Assuming you want to use an icon
+import { DollarSign, Clock } from "lucide-react";
+import { Image as ImageIcon, FileText, File } from "lucide-react";
 import Button from "./Button";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 function ProposalsShow({ proposal }) {
   const { jobs } = useSelector((state) => state.auth);
+  const renderFileIcon = (file) => {
+    const fileType = file?.type?.split("/")[0];
+
+    switch (fileType) {
+      case "image":
+        return <ImageIcon className="h-6 w-6 text-blue-500" />;
+      case "application":
+        if (file.type === "application/pdf") {
+          return <FileText className="h-6 w-6 text-red-500" />;
+        }
+        return <File className="h-6 w-6 text-gray-500" />;
+      default:
+        return <File className="h-6 w-6 text-gray-500" />;
+    }
+  };
   console.log(proposal);
   return (
     <>
@@ -37,6 +54,28 @@ function ProposalsShow({ proposal }) {
               <span className="text-sm">{`Estimated ${proposal.estimatedDuration}`}</span>
             </div>
           </div>
+          {proposal?.attachments.length > 0 && (
+            <div className="">
+              <div className="font-semibold mb-2">Attachments</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {proposal?.attachments?.map((attachment, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center bg-gray-100 p-2 rounded-md shadow-sm"
+                  >
+                    {renderFileIcon({ name: attachment })}
+
+                    <Link
+                      to={attachment}
+                      className="ml-2 text-gray-700 truncate w-14"
+                    >
+                      {attachment}
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div>
             <h3 className="font-semibold mb-2">Proposal</h3>
             <p className="text-sm text-gray-700 mb-2">{proposal.description}</p>

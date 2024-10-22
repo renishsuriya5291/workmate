@@ -11,7 +11,8 @@ const Button = ({ variant = "default", className, children, ...props }) => {
     link: "bg-transparent text-green-600 border-transparent hover:underline",
     black: "bg-black text-white border-transparent hover:bg-gray-800",
     blackSolid:
-      "bg-black text-white border-white hover:bg-white hover:text-black", // New variant
+      "bg-black text-white border-white hover:bg-white hover:text-black",
+    gray: " border-gray-400 hover:text-gray-700 hover:bg-gray-300", // New variant
   };
 
   return (

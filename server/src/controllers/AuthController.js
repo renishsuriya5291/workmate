@@ -60,6 +60,7 @@ const register = async (req, res) => {
       lastName: user.lastName,
       country: user.country,
       role: user.role,
+      experience: "",
     },
   });
 };

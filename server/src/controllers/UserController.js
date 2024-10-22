@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const { uploadCloudinary } = require("../utils/cloudniry");
+const { uploadCloudinary } = require("../utils/cloudniry.js");
 
 const getUser = async (req, res) => {
   try {
@@ -44,48 +44,53 @@ const getUser = async (req, res) => {
 };
 
 const update = async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    location,
+    hourlyRate,
+    country,
+    bio,
+    bioTitle,
+    skills,
+    experience,
+  } = req.body;
+  console.log(experience);
+
   try {
-    const userId = req.user.id; // Get the user ID from req.user.id
-    const { currentPassword, newPassword, ...updates } = req.body; // Destructure the request body
+    const userId = req.user.id; // Modify as necessary based on your auth setup
 
-    // Check if new password is provided
-    if (newPassword) {
-      // Find the user by ID
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+    // Find the user
+    const user = await User.findById(userId);
 
-      // Check if the current password matches the stored password
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) {
-        return res
-          .status(400)
-          .json({ message: "Current password is incorrect" });
-      }
-
-      // Hash the new password and update it
-      user.password = await bcrypt.hash(newPassword, 10);
-      await user.save();
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
     }
 
-    // If no new password, proceed to update other fields
-    const updatedUser = await User.findByIdAndUpdate(userId, updates, {
-      new: true, // Return the updated document
-      runValidators: true, // Ensure that the update follows the schema validations
-      select: "-password", // Exclude the password from the returned document
-    });
+    // Update the specified fields
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (location) user.location = location;
+    if (hourlyRate) user.hourlyRate = hourlyRate;
+    if (country) user.country = country;
+    if (bio) user.bio = bio;
+    if (bioTitle) user.bioTitle = bioTitle;
+    if (skills) user.skills = skills;
+    if (experience) user.experience = experience;
+    // console.log(user.experience);
+    // Save the updated user
+    const updatedUser = await user.save();
 
-    // Check if the user was found and updated
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    // Create a response object without the password
+    const { password, ...userWithoutPassword } = updatedUser._doc;
 
-    // Return the updated user data excluding the password
-    res.status(200).json({ success: true, user: updatedUser });
+    res
+      .status(200)
+      .json({ msg: "User updated successfully", data: userWithoutPassword });
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error updating user:", error); // Logging the error for debugging
+    res.status(500).json({ msg: "Internal server error" });
   }
 };
 

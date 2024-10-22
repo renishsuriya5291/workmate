@@ -31,8 +31,8 @@ export default function NavBarLanding() {
   return (
     <nav
       className={`${
-        scrolled ? "bg-gray-200 shadow-sm py-3" : "bg-white py-4"
-      } sticky top-0 z-50 transition-all duration-300 ease-in-out`}
+        scrolled ? "bg-gray-200 shadow-sm py-1" : "bg-white py-2"
+      } sticky top-0 z-50 transition-all duration-300 ease-in-out border-b border-gray-200`}
     >
       <div className="container mx-auto flex items-center justify-between px-4">
         {/* Logo and nav links in a single container */}
@@ -46,17 +46,23 @@ export default function NavBarLanding() {
             {showNavLinks && (
               <ul className="flex space-x-4">
                 <li className="px-4 transition-colors duration-200">
-                  <Link to="/" className="text-black font-semibold">
+                  <Link to="/" className="text-black font-semibold text-md">
                     Home
                   </Link>
                 </li>
                 <li className="px-4 transition-colors duration-200">
-                  <Link to="/about" className="text-black font-semibold">
+                  <Link
+                    to="/about"
+                    className="text-black font-semibold text-md"
+                  >
                     About
                   </Link>
                 </li>
                 <li className="px-4 transition-colors duration-200">
-                  <Link to="/contact" className="text-black font-semibold">
+                  <Link
+                    to="/contact"
+                    className="text-black font-semibold text-md"
+                  >
                     Contact
                   </Link>
                 </li>

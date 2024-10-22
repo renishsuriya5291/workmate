@@ -7,8 +7,12 @@ const port = process.env.PORT || 5000;
 
 require("dotenv").config();
 
-const v1Routes = require("./src/routes/index");
-
+const v1Routes = require("./src/routes/auth.router.js");
+const v2Routes = require("./src/routes/user.router.js");
+const project = require("./src/routes/project.router.js");
+const review = require("./src/routes/review.route.js");
+const jobs = require("./src/routes/job.router.js");
+const proposals = require("./src/routes/proposals.js");
 // CORS configuration
 const corsOptions = {
   origin: "http://localhost:3000", // Replace this with your frontend's URL in production
@@ -30,7 +34,11 @@ connectToMongo();
 
 // Define routes
 app.use("/api", v1Routes);
-
+app.use("/api/user", v2Routes);
+app.use("/api/project", project);
+app.use("/api/review", review);
+app.use("/api/job", jobs);
+app.use("/api/proposal", proposals);
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

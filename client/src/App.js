@@ -20,9 +20,10 @@ import About from "./Pages/About";
 import Contact from "./Pages/Contact";
 import PageTransitionWrapper from "./Components/PageTransitionWrapper"; // Import the new component
 import ScrollToTop from "./Components/ScrollTop";
-import EditableComponent from "./Pages/Profile";
+import EditProfile from "./Pages/FreeLancer/Profile";
 import axios from "axios";
 import { setUser, logout } from "./react-redux/store";
+import Proposals from "./Pages/Client/Proposals";
 
 function App() {
   const role = useSelector((state) => state.auth?.user?.role);
@@ -138,6 +139,20 @@ function App() {
         />
 
         <Route
+          path="/client/home/:jobId"
+          element={
+            <>
+              <NavBar role={role} />
+              <PageTransitionWrapper>
+                <ProtectedRoute>
+                  <Proposals />
+                </ProtectedRoute>
+              </PageTransitionWrapper>
+            </>
+          }
+        />
+
+        <Route
           path="/freelancer/about"
           element={
             <>
@@ -172,7 +187,7 @@ function App() {
               <NavBar role={role} />
               <PageTransitionWrapper>
                 <ProtectedRoute>
-                  <EditableComponent />
+                  <EditProfile />
                 </ProtectedRoute>
               </PageTransitionWrapper>
             </>
@@ -236,7 +251,7 @@ function App() {
       </Routes>
 
       {/* Footer appears across all pages */}
-      <Footer role={role} />
+      {/* <Footer role={role} /> */}
     </Router>
   );
 }

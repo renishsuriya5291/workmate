@@ -9,16 +9,16 @@ const TextAreaComponent = () => {
   };
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col w-full">
       <label htmlFor="textarea" className="mb-2 text-lg font-semibold">
-        Your Message:
+        Project description:
       </label>
       <textarea
         id="textarea"
         value={value}
         onChange={handleChange}
-        placeholder="Type your message here..."
-        className="h-32 p-2 border transition-colors border-gray-300 rounded-lg focus:outline-black"
+        placeholder="Brefily describe the project's goals,your solutions and the impact you made here..."
+        className="h-32 p-2 w-full border transition-colors border-gray-300 rounded-lg focus:outline-black"
       />
     </div>
   );

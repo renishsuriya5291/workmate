@@ -26,7 +26,7 @@ const NavBar = () => {
   const handleLogout = async () => {
     try {
       // Make the API call for logout
-      await axios.post("/api/logout", {}, { withCredentials: true });
+      await axios.delete("/api/logout", {}, { withCredentials: true });
 
       // Dispatch the logout action
       dispatch(logout());
@@ -71,8 +71,8 @@ const NavBar = () => {
   return (
     <nav
       className={`${
-        scrolled ? "bg-gray-200 shadow-sm py-3" : "bg-white py-4"
-      } sticky top-0 z-50 transition-all duration-300 ease-in-out `}
+        scrolled ? "bg-gray-200 shadow-sm py-1" : "bg-white py-2"
+      } sticky top-0 z-50 transition-all duration-300 ease-in-out border-b border-gray-200 `}
     >
       <div className="container mx-auto flex items-center justify-between px-4">
         {/* Logo and navigation links */}
@@ -95,7 +95,7 @@ const NavBar = () => {
             </svg>
           </button>
           <Link to="/">
-            <img src="/logo-2.png" alt="Logo" className="h-6 sm:h-8 " />
+            <img src="/logo-2.png" alt="Logo" className="h-8 sm:h-11 " />
           </Link>
 
           {/* Hamburger Icon for mobile */}
@@ -108,13 +108,13 @@ const NavBar = () => {
                   <li className="px-4 transition-colors duration-200">
                     {role === "freelancer" &&
                     !currentPath.startsWith("/freelancer") ? (
-                      <Link to="/" className="text-black text-sm">
+                      <Link to="/" className="text-black text-md font-semibold">
                         Home
                       </Link>
                     ) : (
                       <Link
                         to="/freelancer/home"
-                        className="text-black text-sm"
+                        className="text-black text-md font-semibold"
                       >
                         Home
                       </Link>
@@ -123,13 +123,16 @@ const NavBar = () => {
                   <li className="px-4 transition-colors duration-200">
                     {role === "freelancer" &&
                     !currentPath.startsWith("/freelancer") ? (
-                      <Link to="/about" className="text-black text-sm">
+                      <Link
+                        to="/about"
+                        className="text-black text-md font-semibold"
+                      >
                         About
                       </Link>
                     ) : (
                       <Link
                         to="/freelancer/about"
-                        className="text-black text-sm"
+                        className="text-black text-md font-semibold"
                       >
                         About
                       </Link>
@@ -138,13 +141,16 @@ const NavBar = () => {
                   <li className="px-4 transition-colors duration-200">
                     {role === "freelancer" &&
                     !currentPath.startsWith("/freelancer") ? (
-                      <Link to="/contact" className="text-black text-sm ">
+                      <Link
+                        to="/contact"
+                        className="text-black text-md font-semibold"
+                      >
                         Contact
                       </Link>
                     ) : (
                       <Link
                         to="/freelancer/contact"
-                        className="text-black text-sm "
+                        className="text-black text-md font-semibold"
                       >
                         Contact
                       </Link>
@@ -155,33 +161,48 @@ const NavBar = () => {
                 <>
                   <li className="px-4 transition-colors duration-200">
                     {role === "client" && !currentPath.startsWith("/client") ? (
-                      <Link to="/" className="text-black text-sm">
+                      <Link to="/" className="text-black text-md font-semibold">
                         Home
                       </Link>
                     ) : (
-                      <Link to="/client/home" className="text-black text-sm">
+                      <Link
+                        to="/client/home"
+                        className="text-black text-md font-semibold"
+                      >
                         Home
                       </Link>
                     )}
                   </li>
                   <li className="px-4 transition-colors duration-200">
                     {role === "client" && !currentPath.startsWith("/client") ? (
-                      <Link to="/about" className="text-black text-sm">
+                      <Link
+                        to="/about"
+                        className="text-black text-md font-semibold"
+                      >
                         About
                       </Link>
                     ) : (
-                      <Link to="/client/about" className="text-black text-sm">
+                      <Link
+                        to="/client/about"
+                        className="text-black text-md font-semibold"
+                      >
                         About
                       </Link>
                     )}
                   </li>
                   <li className="px-4 transition-colors duration-200">
                     {role === "client" && !currentPath.startsWith("/client") ? (
-                      <Link to="/contact" className="text-black text-sm">
+                      <Link
+                        to="/contact"
+                        className="text-black text-md font-semibold"
+                      >
                         Contact
                       </Link>
                     ) : (
-                      <Link to="/client/contact" className="text-black text-sm">
+                      <Link
+                        to="/client/contact"
+                        className="text-black text-md font-semibold"
+                      >
                         Contact
                       </Link>
                     )}
@@ -194,8 +215,8 @@ const NavBar = () => {
 
         {/* Right-side buttons and profile dropdown */}
         {isLoggedIn ? (
-          <div className="flex items-center gap-5">
-            <div className="font-semibold text-gray-600 hidden md:block">{`Hi! ${username}`}</div>
+          <div className="flex items-center gap-4">
+            <div className="font-semibold text-gray-600 text-md hidden md:block">{`Hi! ${username}`}</div>
             <div className="flex items-center relative" ref={dropdownRef}>
               {/* Profile photo with dropdown */}
               <div
@@ -216,6 +237,7 @@ const NavBar = () => {
                       <Link
                         to={`/${role}/profile`}
                         className="block px-4 py-2  hover:bg-gray-200"
+                        onClick={handleToggleDropdown}
                       >
                         Profile
                       </Link>

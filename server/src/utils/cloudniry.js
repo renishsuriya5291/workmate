@@ -1,5 +1,5 @@
 const cloudinary = require("cloudinary").v2;
-const fs = require("fs");
+const fs = require("fs").promises;
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -10,19 +10,31 @@ cloudinary.config({
 const uploadCloudinary = async (localFilePath) => {
   try {
     if (!localFilePath) return null;
+
+    // Upload the file to Cloudinary
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "image",
       folder: "uploads",
     });
-    // Delete local file after successful upload to Cloudinary
-    fs.unlinkSync(localFilePath);
 
-    // File has been uploaded successfully
-    // console.log("File is uploaded successfully", response);
+    // After successful upload, delete the local file
+    await fs.unlink(localFilePath);
+
+    // Return the Cloudinary response
     return response;
   } catch (error) {
-    fs.unlinkSync(localFilePath); // Remove locally saved temporary file as the upload failed
-    // console.error("Error uploading file:", error);
+    // console.error("Error uploading file to Cloudinary:", error);
+
+    // Attempt to delete the local file if the upload failed
+    try {
+      await fs.unlink(localFilePath);
+    } catch (unlinkError) {
+      // console.error(
+      //   "Error deleting local file after upload failure:",
+      //   unlinkError
+      // );
+    }
+
     return null;
   }
 };

@@ -1,32 +1,41 @@
 // src/Pages/About.js
-import React from "react";
-import withAuthRedirect from "../Components/withAuthRedirect";
+import React, { useState } from "react";
 
 const About = () => {
+  const [isLoading, setIsLoading] = useState(true);
   return (
     <>
-      <section className="relative bg-black py-20">
+      <section className={`relative ${isLoading ? "" : "bg-black"} py-20`}>
         <div className="container mx-auto px-4">
           <div className="flex flex-col justify-center min-h-[70vh]">
             {/* Image as background with lower opacity */}
             <div className="absolute inset-0">
+              {isLoading && (
+                <div className="flex justify-center w-full h-full items-center">
+                  <div className="w-[97%] h-[93%] rounded-lg mx-auto bg-gray-300 animate-pulse"></div>
+                </div>
+              )}
               <img
                 src="/img-5.png"
-                alt="PeoplePerHour Team"
+                alt="description"
+                onLoad={() => setIsLoading(false)}
+                style={{ display: isLoading ? "none" : "block" }}
                 className="w-full h-full object-cover opacity-65"
               />
             </div>
-            <div className="relative z-10 max-w-xl w-full md:pl-8">
-              {/* This div keeps the text above the image */}
-              <h2 className="text-4xl font-semibold text-white mb-4">
-                About WorkMate
-              </h2>
-              <p className="text-xl sm:text-2xl text-white mb-8">
-                We empower people worldwide to live their work dream, building
-                their business from the ground up and becoming financially and
-                professionally independent.
-              </p>
-            </div>
+            {/* Only show text if the image has loaded */}
+            {!isLoading && (
+              <div className="relative z-10 max-w-xl w-full md:pl-8">
+                <h2 className="text-4xl font-semibold text-white mb-4">
+                  About WorkMate
+                </h2>
+                <p className="text-xl sm:text-2xl text-white mb-8">
+                  We empower people worldwide to live their work dream, building
+                  their business from the ground up and becoming financially and
+                  professionally independent.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>

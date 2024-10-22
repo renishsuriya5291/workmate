@@ -5,13 +5,29 @@ import { Search } from "lucide-react";
 import { ChevronDown } from "lucide-react"; // Assuming you want to use an icon
 import Button from "../../Components/Button";
 import ProposalsShow from "../../Components/ProposalsShow";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { addAllPropsal } from "../../react-redux/store";
 import axios from "axios";
 function Proposals() {
   const { jobId } = useParams();
   const [query, setQuery] = useState("");
   const { proposals } = useSelector((state) => state.auth);
   const [pro, setPro] = useState([]);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchProposals = async () => {
+      try {
+        const response = await axios.get("/api/proposal/all");
+        if (response.status === 200) {
+          dispatch(addAllPropsal(response.data));
+        }
+      } catch (error) {
+        console.error("Error fetching proposals:", error);
+      }
+    };
+    fetchProposals();
+  }, [dispatch]);
 
   useEffect(() => {
     const fetchProposals = async () => {

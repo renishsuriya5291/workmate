@@ -54,23 +54,7 @@ function App() {
       } catch (error) {}
     };
 
-    const fetchProposals = async () => {
-      try {
-        const response = await axios.get("/api/proposal/all");
-        if (response.status === 200) {
-          dispatch(addAllPropsal(response.data));
-        }
-      } catch (error) {
-        console.error("Error fetching proposals:", error);
-      } finally {
-      }
-    };
-
-    const fet = async () => {
-      await fetchUser();
-      await fetchProposals();
-    };
-    fet();
+    fetchUser();
   }, [dispatch]);
 
   return (

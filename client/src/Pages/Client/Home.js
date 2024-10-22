@@ -10,11 +10,13 @@ import Input from "../../Components/Input";
 import axios from "axios";
 import { addjob, addAllJobs, addAllPropsal } from "../../react-redux/store";
 import toast, { Toaster } from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 
 import JobPage from "../../Components/JobPage";
 
 const CHome = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
@@ -32,12 +34,27 @@ const CHome = () => {
       }
     };
 
+    const fetchProposals = async () => {
+      setLoading(true); // Optional: You might want to set loading here too
+      try {
+        const response = await axios.get("/api/proposal/all");
+        if (response.status === 200) {
+          dispatch(addAllPropsal(response.data));
+        }
+      } catch (error) {
+        console.error("Error fetching proposals:", error);
+      } finally {
+        setLoading(false); // Ensure loading is set to false
+      }
+    };
+
     const fetchData = async () => {
       await fetchJobs();
+      await fetchProposals(); // Ensure you're calling the correct function
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, location.pathname]);
 
   const initialState = {
     title: "",

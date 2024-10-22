@@ -50,7 +50,7 @@ const createProposal = async (req, res) => {
 const getAll = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    console.log(user);
+    // console.log(user);
     if (user.role === "freelancer") {
       const proposals = await Proposal.find({
         freelancer: req.user.id,

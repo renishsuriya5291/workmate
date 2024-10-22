@@ -268,8 +268,8 @@ const JobCard = ({ job, handleLike, calculateTimeAgo }) => {
               </span>
             ))}
           </div>
-          <div className="flex justify-between">
-            <div className="mt-5 flex gap-4 flex-col sm:flex-row sm:gap-6">
+          <div className="flex flex-col md:flex-row justify-between mt-5 gap-4">
+            <div className="flex flex-col sm:flex-row sm:gap-6 w-full">
               <span className="flex gap-1 items-center">
                 <MapPin className="h-5 text-gray-500" />
                 <span className="text-gray-500 text-sm">{job.location}</span>
@@ -282,14 +282,19 @@ const JobCard = ({ job, handleLike, calculateTimeAgo }) => {
               </span>
               <span className="flex gap-1 items-center">
                 <BarChart className="h-5 text-gray-500" />
-                <span className="text-gray-500 text-sm">{`${job?.proposals?.length} proposals`}</span>
+                <span className="text-gray-500 text-sm">
+                  {proposals?.filter((proposal) => proposal.job === job._id)
+                    .length || 0}{" "}
+                  proposals
+                </span>
               </span>
               <span className="flex gap-1 items-center">
                 <FolderIcon className="h-5 text-gray-500" />
                 <span className="text-gray-500 text-sm">{job.category}</span>
               </span>
             </div>
-            <div>
+
+            <div className="flex flex-col sm:flex-row items-start gap-2">
               {proposals?.some((proposal) => proposal.job === job._id) ? (
                 <span className="flex gap-3">
                   {proposals.map((proposal) => {
@@ -320,7 +325,6 @@ const JobCard = ({ job, handleLike, calculateTimeAgo }) => {
                     }
                     return null; // Return null for proposals that don't match
                   })}
-                  {/* Only render the first matching proposal */}
                 </span>
               ) : (
                 <Button variant="black" onClick={() => modalOpen(job)}>

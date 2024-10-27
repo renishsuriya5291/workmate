@@ -145,18 +145,14 @@ const query = async (req, res) => {
       ],
     });
 
-    // If no users are found, return an empty array or appropriate message
-
-    // Extract user IDs from the found users
     const userIds = users.map((user) => user._id);
 
-    // Find proposals associated with the found users
     const proposals = await Proposal.find({
-      freelancer: { $in: userIds },
       job: jobId,
       $or: [
         { title: { $regex: searchQuery, $options: "i" } },
         { description: { $regex: searchQuery, $options: "i" } },
+        { freelancer: { $in: userIds } },
       ],
     }).populate("freelancer", "username experience profilePicture");
     res.status(200).json(proposals);

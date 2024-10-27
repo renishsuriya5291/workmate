@@ -18,6 +18,7 @@ router.get("/all", authenticateToken, getAll);
 router.put("/update/:jobId/:proId", update);
 router.delete("/delete/:proId", deletePro);
 router.get("/proposals/:jobId", query);
+
 // Upload route
 router.post(
   "/upload",

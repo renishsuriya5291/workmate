@@ -18,6 +18,7 @@ const authSlice = createSlice({
     },
     jobs: [],
     proposals: [],
+    contracts: [],
   },
   reducers: {
     login: (state, action) => {
@@ -30,6 +31,7 @@ const authSlice = createSlice({
       state.proflie.projects = [];
       state.jobs = [];
       state.proposals = [];
+      state.contracts = [];
     },
     setUser: (state, action) => {
       if (action.payload.user) {
@@ -41,6 +43,7 @@ const authSlice = createSlice({
         state.proflie.projects = [];
         state.jobs = [];
         state.proposals = [];
+        state.contracts = [];
       }
     },
     updateUser: (state, action) => {
@@ -125,6 +128,26 @@ const authSlice = createSlice({
         (proposal) => proposal._id !== action.payload._id
       );
     },
+    addContract: (state, action) => {
+      state.contracts.push(action.payload); // Add a new contract
+    },
+    addAllContracts: (state, action) => {
+      state.contracts = action.payload; // Replace contracts with new data
+    },
+    updateContract: (state, action) => {
+      console.log("fsdfsd");
+      const index = state.contracts.findIndex(
+        (contract) => contract._id === action.payload._id
+      );
+      if (index !== -1) {
+        state.contracts[index] = action.payload;
+      }
+    },
+    deleteContract: (state, action) => {
+      state.contracts = state.contracts.filter(
+        (contract) => contract._id !== action.payload._id
+      );
+    },
   },
 });
 
@@ -148,6 +171,10 @@ export const {
   addAllPropsal,
   updateProposal,
   removeProposal,
+  addContract,
+  updateContract,
+  deleteContract,
+  addAllContracts,
 } = authSlice.actions;
 
 const persistedReducer = persistReducer(persistConfig, authSlice.reducer);

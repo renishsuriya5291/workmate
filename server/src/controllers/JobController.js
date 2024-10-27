@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const Job = require("../models/Job");
 const User = require("../models/User");
+const Proposal = require("../models/Proposal");
 
 const jobSchema = Joi.object({
   title: Joi.string().required().messages({
@@ -114,8 +115,21 @@ const editJob = async (req, res) => {
         .status(400)
         .json({ message: "freelancers not allowed to create job" });
     }
-    console.log("srgr");
+
     const { jobId } = req.params;
+
+    const jobc = await Job.findById(jobId);
+    if (!jobc) {
+      return res.status(404).json({ message: "Job not found." });
+    }
+
+    // Check if the job status is "in_progress"
+    if (jobc.status === "in_progress") {
+      return res
+        .status(403)
+        .json({ message: "Cannot edit a job that is in progress." });
+    }
+
     const updatedData = req.body;
     const { error } = jobSchema.validate(updatedData);
     if (error) {
@@ -155,14 +169,32 @@ const cancel = async (req, res) => {
         .json({ message: "You are not authorized to cancel this job." });
     }
 
+    if (job.status === "in_progress") {
+      return res.status(400).json({
+        message: "You cannot cancel a job that is currently in progress.",
+      });
+    }
+
+    // Fetch related proposals before deleting
+    const relatedProposals = await Proposal.find({ job: jobId });
+
+    // Delete related proposals
+    if (req.body.status === "closed") {
+      await Proposal.deleteMany({ job: jobId });
+    }
+
     const updatedJob = await Job.findByIdAndUpdate(
       jobId,
       { status: req.body.status },
       { new: true }
     );
-    return res
-      .status(200)
-      .json({ message: "Job successfully cancelled.", job: updatedJob });
+
+    // Optional: Send the proposals in the response if needed
+    return res.status(200).json({
+      message: "Job successfully cancelled.",
+      job: updatedJob,
+      proposals: relatedProposals,
+    });
   } catch (error) {
     console.error(error);
     return res

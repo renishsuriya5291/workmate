@@ -1,11 +1,20 @@
-import React from "react";
-import { DollarSign, Clock } from "lucide-react";
+import React, { useState } from "react";
+import { DollarSign, Clock, X } from "lucide-react";
 import { Image as ImageIcon, FileText, File } from "lucide-react";
 import Button from "./Button";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import Modal from "./Modal";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
+import { addContract, updateJob, updateProposal } from "../react-redux/store";
 function ProposalsShow({ proposal }) {
   const { jobs } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [modal, setModal] = useState({
+    accpect: false,
+    notice: false,
+  });
   const renderFileIcon = (file) => {
     const fileType = file?.type?.split("/")[0];
 
@@ -21,7 +30,46 @@ function ProposalsShow({ proposal }) {
         return <File className="h-6 w-6 text-gray-500" />;
     }
   };
-  console.log(proposal);
+  const handleContract = async () => {
+    try {
+      const jobId = proposal.job; // Job ID
+      const proposalId = proposal._id; // Proposal ID
+
+      const payload = {
+        freelancerId: proposal.freelancer._id,
+        amount: proposal.amount,
+        estimatedDuration: proposal.estimatedDuration,
+        // Add any other necessary fields here
+      };
+
+      // Call the API to create the contract
+      const response = await axios.post(
+        `/api/contract/addContract/${jobId}/${proposalId}`,
+        payload
+      );
+
+      // Check if the response is successful
+      if (response.status === 201) {
+        console.log("Contract created:", response.data);
+        dispatch(updateJob(response.data.job));
+        dispatch(updateProposal(response.data.proposal));
+        dispatch(addContract(response.data.contract));
+        closeModal("accept");
+        openModal("notice");
+      }
+    } catch (error) {
+      console.error("Error creating contract:", error);
+      // Optionally handle error (e.g., show a notification)
+    }
+  };
+
+  const openModal = (name) => {
+    setModal((s) => ({ ...s, [name]: true }));
+  };
+  const closeModal = (name) => {
+    setModal((s) => ({ ...s, [name]: false }));
+  };
+
   return (
     <>
       <div className="border rounded-lg shadow-md overflow-hidden w-full">
@@ -97,10 +145,100 @@ function ProposalsShow({ proposal }) {
           </div>
         </div>
         <div className="p-4 border-t flex justify-between  items-center">
-          <Button variant="outline">Message</Button>
-          <Button variant="black">Accept Proposal</Button>
+          <Button variant="outline" onClick={() => openModal("notice")}>
+            Message
+          </Button>
+          <Button variant="black" onClick={() => openModal("accpect")}>
+            Accept Proposal
+          </Button>
         </div>
       </div>
+      <Modal isOpen={modal.accpect} onClose={() => closeModal("accpect")}>
+        <div className="relative sm:max-w-[425px] w-full mx-auto p-4 overflow-y-auto max-h-[75vh] rounded-lg shadow-lg bg-white border border-gray-300 z-10">
+          <div className="flex justify-between mb-4">
+            <h2 className="text-lg font-semibold">Accept Proposal</h2>
+            <X
+              className="h-5 cursor-pointer"
+              onClick={() => closeModal("accpect")}
+            />
+          </div>
+          <p className=" text-gray-500 mb-4">
+            {`You're about to accept the proposal from ${proposal.freelancer.username}. This will
+            initiate the project.`}
+          </p>
+          <div className="flex flex-col gap-1">
+            <div className="flex gap-1">
+              <span>Project:</span>
+              <span>
+                {jobs
+                  .filter((job) => job._id === proposal.job)
+                  .map((job) => job.title)}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              <span>Price:</span>
+              <div className="flex gap-1">
+                <div className="flex ">
+                  <span>$</span>
+                  <span>{proposal.amount}</span>
+                </div>
+                <span>
+                  (
+                  {jobs
+                    .filter((job) => job._id === proposal.job)
+                    .map((job) => job.paymentType)}
+                  )
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-1">
+              <span>Estimated Time:</span>
+              <span>{proposal.estimatedDuration}</span>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end ">
+            <Button variant="black" onClick={handleContract}>
+              Confirm Acceptance
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <Modal isOpen={modal.notice} onClose={() => closeModal("notice")}>
+        <div className="relative sm:max-w-[425px] w-full mx-auto p-6 overflow-y-auto max-h-[75vh] rounded-lg shadow-lg bg-white border border-gray-300 z-10">
+          <div className="flex justify-between mb-4">
+            <h2 className="text-lg font-semibold">Proposal Accepted</h2>
+            <X
+              className="h-5 cursor-pointer"
+              onClick={() => closeModal("notice")}
+            />
+          </div>
+          <p className=" text-gray-500 mb-4">
+            You've successfully accepted the proposal. Here are the next steps:
+          </p>
+          <ol className="flex flex-col gap-2 mt-4" type="1">
+            <li>1. The freelancer will be notified of your acceptance.</li>
+            <li>
+              2. You can now start communicating directly to discuss project
+              details.
+            </li>
+            <li>3. Agree on milestones and payment schedule.</li>
+            <li>
+              4. The freelancer will begin work as per the agreed timeline.
+            </li>
+          </ol>
+
+          <div className="mt-4 flex justify-end ">
+            <Button
+              variant="black"
+              onClick={() => {
+                navigate("/client/home");
+              }}
+            >
+              Got it, thanks!
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

@@ -80,6 +80,24 @@ function Proposals() {
                     />
                   ))}
             </div>
+            {pro.length === 0 &&
+              proposals.filter((proposal) => proposal.job === jobId).length ===
+                0 && (
+                <>
+                  <div className="flex flex-col items-center justify-center">
+                    <span className="w-full max-w-xs ">
+                      <img
+                        src="/not.png"
+                        alt="No proposals found"
+                        className="w-full h-auto object-cover"
+                      />
+                    </span>
+                    <p className="mt-4 text-gray-500 text-center">
+                      No proposals found.
+                    </p>
+                  </div>
+                </>
+              )}
           </div>
         </div>
       </div>

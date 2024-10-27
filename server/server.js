@@ -13,6 +13,7 @@ const project = require("./src/routes/project.router.js");
 const review = require("./src/routes/review.route.js");
 const jobs = require("./src/routes/job.router.js");
 const proposals = require("./src/routes/proposals.js");
+const contracts = require("./src/routes/Contract.route.js");
 // CORS configuration
 const corsOptions = {
   origin: "http://localhost:3000", // Replace this with your frontend's URL in production
@@ -39,6 +40,8 @@ app.use("/api/project", project);
 app.use("/api/review", review);
 app.use("/api/job", jobs);
 app.use("/api/proposal", proposals);
+app.use("/api/contract", contracts);
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

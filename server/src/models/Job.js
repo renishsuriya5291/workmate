@@ -62,10 +62,14 @@ const JobSchema = new mongoose.Schema(
 JobSchema.pre("remove", async function (next) {
   const Job = this.model("Job");
   const Proposal = mongoose.model("Proposal"); // Assuming you have a Proposal model
-
+  const User = mongoose.model("User");
   try {
     // Delete proposals related to the job being removed
     await Proposal.deleteMany({ job: this._id });
+    await User.updateMany(
+      { likedBy: this._id },
+      { $pull: { likedBy: this._id } }
+    );
     next();
   } catch (error) {
     next(error);

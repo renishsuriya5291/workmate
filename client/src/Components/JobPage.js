@@ -81,17 +81,22 @@ function JobPage({ children }) {
       const response = await axios.put(`/api/job/cancel/${ujob._id}`, {
         status: ujob.status,
       });
-      console.log(response);
+
       if (response.status === 200) {
         toast.success(`Job ${ujob.status} successfully!`);
         setUjob(initialState);
-        cm();
         dispatch(updateJob(response.data.job));
+        dispatch(addAllPropsal(response.data.proposals));
+        cm();
       } else {
         toast.error("Failed to delete Job. Please try again.");
       }
     } catch (error) {
-      toast.error("Failed to delete Job. Please try again.");
+      cm();
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to cancel the job. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -316,25 +321,35 @@ function JobPage({ children }) {
                 </div>
               </div>
               <div className="mt-5 flex justify-between items-center">
-                <Button
-                  variant="gray"
-                  className="flex gap-2"
-                  onClick={() => handleOpenModal(job)}
-                >
-                  <Edit className="h-5" />
-                  <span>Edit Job</span>
-                </Button>
-                <Button variant="gray" className="flex gap-2">
-                  <Eye className="h-5" />
-                  <Link to={`/client/home/${job._id}`}>
-                    View Proposals (
-                    {
-                      proposals.filter((proposal) => proposal.job === job._id)
-                        .length
-                    }
-                    )
-                  </Link>
-                </Button>
+                {job.status !== "in_progress" && (
+                  <Button
+                    variant="gray"
+                    className="flex gap-2"
+                    onClick={() => handleOpenModal(job)}
+                  >
+                    <Edit className="h-5" />
+                    <span>Edit Job</span>
+                  </Button>
+                )}
+                {job.status !== "in_progress" && job.status !== "closed" && (
+                  <Button variant="gray" className="flex gap-2">
+                    <Eye className="h-5" />
+                    <Link to={`/client/home/${job._id}`}>
+                      View Proposals (
+                      {
+                        proposals.filter((proposal) => proposal.job === job._id)
+                          .length
+                      }
+                      )
+                    </Link>
+                  </Button>
+                )}
+                {job.status === "in_progress" && (
+                  <Button variant="gray" className="flex gap-2">
+                    <Eye className="h-5" />
+                    <Link>View Progress</Link>
+                  </Button>
+                )}
                 {job.status === "closed" && (
                   <Button variant="gray" onClick={() => ho(job, "open")}>
                     Open Job

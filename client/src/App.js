@@ -24,6 +24,7 @@ import EditProfile from "./Pages/FreeLancer/Profile";
 import axios from "axios";
 import { setUser, logout, addAllPropsal } from "./react-redux/store";
 import Proposals from "./Pages/Client/Proposals";
+import Contract from "./Pages/Client/Contract";
 
 function App() {
   const role = useSelector((state) => state.auth?.user?.role);
@@ -46,8 +47,6 @@ function App() {
             })
           );
         } else {
-          // Clear the Redux state and local storage if no user data is found
-          // console.log("No user data found, clearing state");
           dispatch(logout()); // Call logout to reset Redux state
           localStorage.removeItem("persist:root"); // Clear persisted state
         }
@@ -202,6 +201,20 @@ function App() {
               <PageTransitionWrapper>
                 <ProtectedRoute>
                   <CHome />
+                </ProtectedRoute>
+              </PageTransitionWrapper>
+            </>
+          }
+        />
+
+        <Route
+          path="/client/contract/:contractId"
+          element={
+            <>
+              <NavBar role={role} />
+              <PageTransitionWrapper>
+                <ProtectedRoute>
+                  <Contract />
                 </ProtectedRoute>
               </PageTransitionWrapper>
             </>

@@ -135,7 +135,6 @@ const authSlice = createSlice({
       state.contracts = action.payload; // Replace contracts with new data
     },
     updateContract: (state, action) => {
-      console.log("fsdfsd");
       const index = state.contracts.findIndex(
         (contract) => contract._id === action.payload._id
       );

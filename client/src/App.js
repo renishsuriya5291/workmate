@@ -222,6 +222,20 @@ function App() {
         />
 
         <Route
+          path="/freelancer/contract/:contractId"
+          element={
+            <>
+              <NavBar role={role} />
+              <PageTransitionWrapper>
+                <ProtectedRoute>
+                  <Contract />
+                </ProtectedRoute>
+              </PageTransitionWrapper>
+            </>
+          }
+        />
+
+        <Route
           path="/client/about"
           element={
             <>

@@ -247,10 +247,145 @@ const editmilestone = async (req, res) => {
       .json({ message: "An error occurred while updating the milestone." });
   }
 };
+const submitWork = async (req, res) => {
+  const { contractId, milestoneId } = req.params;
 
+  try {
+    // Find the contract by its ID
+    const contract = await Contract.findById(contractId);
+
+    // Check if the contract exists
+    if (!contract) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    // Find the milestone that matches the milestoneId
+    const milestone = contract.milestones.id(milestoneId); // Access milestone by its ID
+
+    // Check if the milestone exists
+    if (!milestone) {
+      return res.status(404).json({ message: "Milestone not found" });
+    }
+
+    // Ensure the freelancer submitting work is the correct freelancer
+    if (milestone.freelancer !== req.user._id) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to submit work for this milestone" });
+    }
+
+    // Ensure the milestone status is "pending"
+    if (milestone.status !== "pending") {
+      return res
+        .status(400)
+        .json({ message: "Milestone is not in a pending state" });
+    }
+
+    milestone.freelancerSubmission = true;
+    milestone.clientFeedback = "";
+    milestone.status = "in_review";
+
+    await contract.save();
+
+    res.status(200).json({
+      message: "Work submitted successfully",
+      contract: contract,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+const revisionWork = async (req, res) => {
+  const { contractId, milestoneId } = req.params;
+  const { feedback } = req.body;
+
+  try {
+    // Find the contract by its ID
+    const contract = await Contract.findById(contractId);
+
+    if (!contract) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    // Find the milestone in the contract
+    const milestone = contract.milestones.id(milestoneId);
+
+    if (!milestone) {
+      return res.status(404).json({ message: "Milestone not found" });
+    }
+
+    // Ensure the client is providing the feedback (this is a basic check)
+    if (milestone.client !== req.user._id) {
+      return res.status(403).json({ message: "Unauthorized to give feedback" });
+    }
+
+    milestone.clientFeedback = feedback;
+    milestone.status = "pending";
+    milestone.freelancerSubmission = false;
+
+    // Save the updated contract with the feedback and status changes
+    await contract.save();
+
+    // Respond with success message and updated contract
+    res.status(200).json({
+      message: "Feedback provided successfully, freelancer can resubmit work.",
+      contract: contract,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const accpectWork = async (req, res) => {
+  const { contractId, milestoneId } = req.params;
+
+  try {
+    // Step 1: Find the contract by contractId
+    const contract = await Contract.findById(contractId);
+
+    if (!contract) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    // Step 2: Find the milestone within the contract
+    const milestone = contract.milestones.id(milestoneId);
+
+    if (!milestone) {
+      return res.status(404).json({ message: "Milestone not found" });
+    }
+
+    // Step 3: Ensure that the client is the one accepting the work
+    if (milestone.client !== req.user._id) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to accept this work" });
+    }
+
+    // Step 4: Update the milestone status to "completed" or "in_review"
+    milestone.status = "completed"; // Or 'in_review', depending on your workflow
+    milestone.clientFeedback = "";
+
+    // Step 5: Save the updated contract with the new milestone status
+    await contract.save();
+
+    // Step 6: Respond with success message
+    res.status(200).json({
+      message: "Work accepted successfully, payment processed.",
+      contract,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error while accepting the work" });
+  }
+};
 module.exports = {
   addContract,
   getAllContracts,
   createMilestone,
   editmilestone,
+  submitWork,
+  revisionWork,
+  accpectWork,
 };

@@ -26,6 +26,7 @@ function FreelanceMilestoneTimeline() {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("overview");
   const { contracts, user } = useSelector((state) => state.auth);
+  const [clientFeedback, setClientfeedback] = useState("");
 
   const [newMilestone, setNewMilestone] = useState({
     description: "",
@@ -101,9 +102,60 @@ function FreelanceMilestoneTimeline() {
       status: "pending",
       dueDate: "",
     });
+    setClientfeedback("");
     setEdit(false);
   };
+  const handleAccept = async (milestone) => {
+    try {
+      const response = await axios.post(
+        `/api/contract/accpect/${contractId}/${milestone._id}`
+      );
 
+      if (response.status === 200) {
+        dispatch(updateContract(response.data.contract));
+        toast.success("work accpect succfully");
+        closeModal();
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
+  const submitWork = async (milestone) => {
+    try {
+      const response = await axios.post(
+        `/api/contract/submit/${contractId}/${milestone._id}`
+      );
+
+      if (response.status === 200) {
+        dispatch(updateContract(response.data.contract));
+        toast.success("work submitted succfully");
+        closeModal();
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+  const handleRequestRevision = async (milestone) => {
+    if (clientFeedback.trim() === "") {
+      toast.error("enter the feedback please");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `/api/contract/submit/feedack/${contractId}/${milestone._id}`,
+        { feedback: clientFeedback }
+      );
+
+      if (response.status === 200) {
+        dispatch(updateContract(response.data.contract));
+        toast.success(response.data.message);
+        closeModal();
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
   const addMilestone = async (e) => {
     e.preventDefault();
     if (edit) {
@@ -111,7 +163,12 @@ function FreelanceMilestoneTimeline() {
         (contract) => contract._id === contractId
       );
       const mileston = contractt?.milestones[contractt?.milestones?.length - 1];
-      if (mileston && mileston.status !== "pending") {
+
+      if (
+        mileston &&
+        mileston.status !== "pending" &&
+        mileston.paymentStatus === "not_paid"
+      ) {
         toast.error(
           "Please complete the previous milestone before adding a new one."
         );
@@ -125,10 +182,11 @@ function FreelanceMilestoneTimeline() {
       );
       const milestone =
         contractt?.milestones[contractt?.milestones?.length - 1];
+      console.log(milestone);
       if (
         milestone &&
         milestone.status !== "completed" &&
-        milestone.paymentStatus !== "paid"
+        milestone.paymentStatus === "not_paid"
       ) {
         toast.error(
           "Please complete the previous milestone before adding a new one."
@@ -200,6 +258,7 @@ function FreelanceMilestoneTimeline() {
       setNewMilestone({ description: "", amount: 0, dueDate: "" });
     }
   };
+  console.log(clientFeedback);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -377,16 +436,25 @@ function FreelanceMilestoneTimeline() {
                     ))}
                 </div>
               </div>
-              <div className="relative mt-8 pl-12">
-                <Button
-                  variant="black"
-                  className="flex gap-2 items-center"
-                  onClick={() => setModal(true)}
-                >
-                  <CirclePlus className="h-4 w-4" />
-                  <span>Add Milestone</span>
-                </Button>
-              </div>
+              {!contracts.find((contract) => contract._id === contractId)
+                ?.milestones && user.role === "freelancer" ? (
+                <div className="relative mt-8 pl-12">
+                  <p className="text-gray-500">
+                    Milestones are not available for freelancers at this time.
+                  </p>
+                </div>
+              ) : user.role === "client" ? (
+                <div className="relative mt-8 pl-12">
+                  <Button
+                    variant="black"
+                    className="flex gap-2 items-center"
+                    onClick={() => setModal(true)}
+                  >
+                    <CirclePlus className="h-4 w-4" />
+                    <span>Add Milestone</span>
+                  </Button>
+                </div>
+              ) : null}
             </TabsContent>
           </div>
 
@@ -556,6 +624,16 @@ function FreelanceMilestoneTimeline() {
                     </p>
                   </div>
                 )}
+                {!edit &&
+                  user.role === "freelancer" &&
+                  selectedMilestone.clientFeedback && (
+                    <div className="flex gap-1">
+                      <p>Feedback : </p>
+                      <p className=" italic text-gray-700">
+                        "{selectedMilestone.clientFeedback}"
+                      </p>
+                    </div>
+                  )}
 
                 {edit && (
                   <div className="mb-4 flex-1">
@@ -585,9 +663,11 @@ function FreelanceMilestoneTimeline() {
                         Feedback
                       </label>
                       <textarea
-                        name="feedback"
+                        name="clientFeedback"
                         id="feedback"
                         rows="4" // Set a default height
+                        value={clientFeedback}
+                        onChange={(e) => setClientfeedback(e.target.value)}
                         className="border border-gray-300 rounded-lg p-2 resize-none"
                         placeholder="Enter your feedback here..."
                       />
@@ -600,7 +680,7 @@ function FreelanceMilestoneTimeline() {
                     selectedMilestone.status === "in_review" && (
                       <Button
                         variant="ghost"
-                        // onClick={() => handleAccept(selectedMilestone)}
+                        onClick={() => handleAccept(selectedMilestone)}
                       >
                         Accept Work
                       </Button>
@@ -621,16 +701,25 @@ function FreelanceMilestoneTimeline() {
                     selectedMilestone.status === "in_review" && (
                       <Button
                         variant="black"
-                        // onClick={() => handleRequestRevision(selectedMilestone)}
+                        onClick={() => handleRequestRevision(selectedMilestone)}
                       >
                         Request Revision
+                      </Button>
+                    )}
+                  {user.role === "client" &&
+                    selectedMilestone.status === "completed" && (
+                      <Button
+                        variant="black"
+                        // onClick={() => handleRequestRevision(selectedMilestone)}
+                      >
+                        Make Payment
                       </Button>
                     )}
                   {user.role === "freelancer" &&
                     selectedMilestone.status === "pending" && (
                       <Button
                         variant="black"
-                        // onClick={() => handleSubmitWork(selectedMilestone)}
+                        onClick={() => submitWork(selectedMilestone)}
                       >
                         Submit Work
                       </Button>

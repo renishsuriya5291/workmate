@@ -17,6 +17,7 @@ import {
   updateJob,
   updateUser,
   addAllPropsal,
+  addAllContracts,
 } from "../../react-redux/store";
 import JobCard from "../../Components/JobCard";
 import { useLocation } from "react-router-dom";
@@ -65,9 +66,21 @@ const FHome = () => {
         console.error("Error fetching jobs:", error);
       }
     };
+
+    const fetchContracts = async () => {
+      try {
+        const response = await axios.get("/api/contract/getallcontracts");
+        if (response.status === 200) {
+          dispatch(addAllContracts(response.data.contracts)); // Assuming you have an action for contracts
+        }
+      } catch (error) {
+        console.error("Error fetching contracts:", error);
+      }
+    };
     const ft = async () => {
       await fetchProposals();
       await fetchJobs();
+      await fetchContracts();
     };
     ft();
   }, [dispatch, location.pathname]);

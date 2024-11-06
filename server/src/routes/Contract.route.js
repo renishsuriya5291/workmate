@@ -5,6 +5,9 @@ const {
   getAllContracts,
   createMilestone,
   editmilestone,
+  submitWork,
+  revisionWork,
+  accpectWork,
 } = require("../controllers/COntract.controller");
 const authenticateToken = require("../middleware");
 
@@ -15,5 +18,16 @@ router.put(
   "/updatemilestone/:contractId/:milestoneId",
   authenticateToken,
   editmilestone
+);
+router.post("/submit/:contractId/:milestoneId", authenticateToken, submitWork);
+router.post(
+  "/submit/feedack/:contractId/:milestoneId",
+  authenticateToken,
+  revisionWork
+);
+router.post(
+  "/accpect/:contractId/:milestoneId",
+  authenticateToken,
+  accpectWork
 );
 module.exports = router;

@@ -12,11 +12,12 @@ import {
   updateProposal,
   removeProposal,
 } from "../react-redux/store";
+import { Link } from "react-router-dom";
 
 const JobCard = ({ job, handleLike, calculateTimeAgo }) => {
   const dispatch = useDispatch();
 
-  const { user, proposals } = useSelector((state) => state.auth);
+  const { user, proposals, contracts } = useSelector((state) => state.auth);
   const [ajob, setAjob] = useState({
     jobId: "",
     _id: "",
@@ -298,32 +299,50 @@ const JobCard = ({ job, handleLike, calculateTimeAgo }) => {
               {proposals?.some((proposal) => proposal.job === job._id) ? (
                 <span className="flex gap-3">
                   {proposals.map((proposal) => {
+                    // Check if the proposal is from the freelancer for this job and isn't accepted
                     if (
                       proposal.job === job._id &&
                       proposal.freelancer === user._id
                     ) {
-                      return (
-                        <span
-                          key={proposal._id}
-                          className="flex items-center gap-3"
-                        >
-                          <Button
-                            variant="ghost"
-                            onClick={() => modalOpen(job, proposal)}
+                      if (proposal.status !== "accepted") {
+                        // Display the Update and Cancel buttons if the proposal isn't accepted
+                        return (
+                          <span
+                            key={proposal._id}
+                            className="flex items-center gap-3"
                           >
-                            Update
-                          </Button>
-                          <Button
-                            variant="black"
-                            className="text-gray-500"
-                            onClick={() => handleProposal(proposal)}
+                            <Button
+                              variant="ghost"
+                              onClick={() => modalOpen(job, proposal)}
+                            >
+                              Update
+                            </Button>
+                            <Button
+                              variant="black"
+                              className="text-gray-500"
+                              onClick={() => handleProposal(proposal)}
+                            >
+                              Cancel
+                            </Button>
+                          </span>
+                        );
+                      } else {
+                        // If the proposal is accepted, show the View button (link to contract)
+                        const contract = contracts.find(
+                          (contract) => contract.job._id === job._id
+                        );
+
+                        return contract ? (
+                          <Link
+                            to={`/freelancer/contract/${contract._id}`}
+                            key={proposal._id}
                           >
-                            Cancel
-                          </Button>
-                        </span>
-                      );
+                            <Button variant="black">View</Button>
+                          </Link>
+                        ) : null;
+                      }
                     }
-                    return null; // Return null for proposals that don't match
+                    return null; // Return null if the proposal doesn't match
                   })}
                 </span>
               ) : (

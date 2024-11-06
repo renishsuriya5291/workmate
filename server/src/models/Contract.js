@@ -33,6 +33,13 @@ const ContractSchema = new mongoose.Schema(
           enum: ["pending", "completed", "in_review"],
           default: "pending",
         },
+        freelancerSubmission: { type: Boolean, default: false },
+        clientFeedback: { type: String },
+        paymentStatus: {
+          type: String,
+          enum: ["not_paid", "paid"],
+          default: "not_paid",
+        },
       },
     ],
     deliverables: [String],

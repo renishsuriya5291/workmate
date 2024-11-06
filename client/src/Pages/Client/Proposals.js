@@ -47,8 +47,8 @@ function Proposals() {
   }, [query]);
 
   return (
-    <>
-      <div className="bg-white p-6 flex flex-col min-h-screen">
+    <div className="bg-white">
+      <div className="bg-white p-6 flex flex-col min-h-screen container mx-auto">
         <div className="border border-gray-200 rounded-md p-8">
           <div className="">
             <div>
@@ -101,7 +101,7 @@ function Proposals() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

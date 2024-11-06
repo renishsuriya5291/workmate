@@ -31,10 +31,9 @@ function JobPage({ children }) {
   const [currentPage, setCurrentPage] = useState(0); // Track current page
   const jobsPerPage = 2; // Number of jobs per page
   const dispatch = useDispatch();
-  const { jobs, proposals } = useSelector((state) => state.auth);
+  const { jobs, proposals, contracts } = useSelector((state) => state.auth);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isopen1, setIsopen1] = useState(false);
-
   const initialState = {
     title: "",
     description: "",
@@ -245,8 +244,8 @@ function JobPage({ children }) {
           </div>
         </div>
       ) : (
-        displayedJobs.map((job) => (
-          <div className="w-full mt-6" key={job.id}>
+        displayedJobs.map((job, index) => (
+          <div className="w-full mt-6" key={index}>
             <div className="border border-gray-200 p-6 rounded-lg">
               <div className="flex text-lg justify-between font-semibold items-center">
                 <div className="flex flex-col gap-1">
@@ -347,7 +346,15 @@ function JobPage({ children }) {
                 {job.status === "in_progress" && (
                   <Button variant="gray" className="flex gap-2">
                     <Eye className="h-5" />
-                    <Link>View Progress</Link>
+                    <Link
+                      to={`/client/contract/${
+                        contracts.find(
+                          (proposal) => proposal.job._id === job._id
+                        )?._id
+                      }`}
+                    >
+                      View Progress
+                    </Link>
                   </Button>
                 )}
                 {job.status === "closed" && (

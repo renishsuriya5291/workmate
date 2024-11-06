@@ -140,6 +140,17 @@ const createMilestone = async (req, res) => {
       });
     }
 
+    const contractStartDate = new Date(contract.startDate);
+    const contractEndDate = new Date(contract.endDate);
+    const newDueDate = new Date(dueDate);
+
+    if (newDueDate < contractStartDate || newDueDate > contractEndDate) {
+      return res.status(400).json({
+        message:
+          "The due date must be within the contract's start and end dates.",
+      });
+    }
+
     // Create the new milestone
     const newMilestone = { description, dueDate, amount };
     contract.milestones.push(newMilestone);
@@ -156,4 +167,90 @@ const createMilestone = async (req, res) => {
   }
 };
 
-module.exports = { addContract, getAllContracts, createMilestone };
+const editmilestone = async (req, res) => {
+  const { contractId, milestoneId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    // Find the contract
+    const contract = await Contract.findById(contractId);
+    if (!contract) {
+      return res.status(404).json({ message: "Contract not found" });
+    }
+
+    // Check if the user is authorized to edit milestones for this contract
+    if (contract.client.toString() !== userId) {
+      return res.status(403).json({
+        message:
+          "Forbidden: You are not allowed to edit a milestone for this contract",
+      });
+    }
+
+    // Find the milestone in the contract's milestones
+    const milestone = contract.milestones.id(milestoneId);
+    if (!milestone) {
+      return res.status(404).json({ message: "Milestone not found" });
+    }
+
+    // Extract new data from the request body
+    const { description, dueDate, amount } = req.body;
+
+    // Validate due date
+    const milestoneIndex = contract.milestones.findIndex(
+      (m) => m._id.toString() === milestoneId
+    );
+
+    // Ensure the milestone index is valid
+    if (milestoneIndex !== -1) {
+      // Check for the previous milestone
+      const previousMilestone = contract.milestones[milestoneIndex - 1];
+      if (dueDate) {
+        if (
+          previousMilestone &&
+          new Date(dueDate) <= new Date(previousMilestone.dueDate)
+        ) {
+          return res.status(400).json({
+            message:
+              "The milestone's due date must be later than the previous milestone's due date.",
+          });
+        }
+
+        // Check if the due date is within the contract's start and end dates
+        const contractStartDate = new Date(contract.startDate);
+        const contractEndDate = new Date(contract.endDate);
+        const newDueDate = new Date(dueDate);
+
+        if (newDueDate < contractStartDate || newDueDate > contractEndDate) {
+          return res.status(400).json({
+            message:
+              "The due date must be within the contract's start and end dates.",
+          });
+        }
+      }
+    }
+
+    // Update the milestone fields
+    milestone.description =
+      description !== undefined ? description : milestone.description;
+    milestone.dueDate = dueDate !== undefined ? dueDate : milestone.dueDate;
+    milestone.amount = amount !== undefined ? amount : milestone.amount;
+
+    // Save the updated contract
+    await contract.save();
+
+    // Return the updated contract
+    res.status(200).json({ contract });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while updating the milestone." });
+  }
+};
+
+module.exports = {
+  addContract,
+  getAllContracts,
+  createMilestone,
+  editmilestone,
+};

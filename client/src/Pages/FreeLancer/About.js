@@ -14,7 +14,7 @@ function FAbout() {
                     <div className="w-full lg:w-7/12 pr-6 mb-6 lg:mb-0">
                         <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
                         <p className="text-gray-700 mb-4">
-                            At [Your Company Name], our mission is to revolutionize the way people interact with their surroundings. We strive to provide innovative solutions that make life easier, more connected, and more enjoyable.
+                            At WorkMate, our mission is to revolutionize the way people interact with their surroundings. We strive to provide innovative solutions that make life easier, more connected, and more enjoyable.
                         </p>
                         <h2 className="text-2xl font-semibold mb-4">Our Values</h2>
                         <ul className="list-disc list-inside text-gray-700 mb-4">
@@ -49,8 +49,21 @@ function FAbout() {
                                     className="w-16 h-16 rounded-full border-2 border-black"
                                 />
                                 <div>
-                                    <h3 className="text-lg font-semibold">John Smith</h3>
-                                    <p className="text-gray-600">Chief Technology Officer</p>
+                                    <h3 className="text-lg font-semibold">Kunj Patel</h3>
+                                    <p className="text-gray-600">CTO</p>
+                                </div>
+
+                            </div>
+                            {/* Team Member 2 */}
+                            <div className="flex items-center space-x-4 mb-4">
+                                <img
+                                    src="https://via.placeholder.com/80"
+                                    alt="Team Member 2"
+                                    className="w-16 h-16 rounded-full border-2 border-black"
+                                />
+                                <div>
+                                    <h3 className="text-lg font-semibold">Karan Zala</h3>
+                                    <p className="text-gray-600">CMO</p>
                                 </div>
                             </div>
                             {/* Add more team members as needed */}

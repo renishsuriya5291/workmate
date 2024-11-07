@@ -247,7 +247,7 @@ function EditProfile() {
       })
       .then((response) => {
         console.log(`User updated successfully`, response.data);
-        toast.success("Data updated successfully!");
+        toast.success("Profile Updated!");
         // Optionally update the Redux store or local state with new data
         console.log("first");
         dispatch(setUserItem(response.data.data));
@@ -273,7 +273,7 @@ function EditProfile() {
       .put(`/api/user/update`, { bio: bioContent })
       .then((response) => {
         console.log("Bio updated successfully", response.data.data);
-        toast.success("Data updated successfully!");
+        toast.success("Profile Updated!");
         dispatch(setUserItem(response.data.data));
         setIsEditing(false);
       })

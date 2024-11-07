@@ -28,7 +28,7 @@ function Skills() {
       .put(`/api/user/update`, { skills: tags })
       .then((response) => {
         console.log(`skills updated successfully`, response.data);
-        toast.success("data updated successfully!");
+        toast.success("Profile Updated!");
         // Optionally update the Redux store or local state with new data
         dispatch(setUserItem(response.data.data));
         closeModal(); // Close the modal after saving

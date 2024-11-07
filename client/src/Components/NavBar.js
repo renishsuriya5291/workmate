@@ -9,7 +9,8 @@ const NavBar = () => {
   const isLoggedIn = useSelector((state) => state.auth.isAuthenticated);
   const role = useSelector((state) => state.auth?.user?.role);
   const photo = useSelector((state) => state.auth?.user?.profilePicture);
-  const username = useSelector((state) => state.auth?.user?.username);
+  const { user } = useSelector((state) => state.auth);
+  const fullname = user.firstName + " " + user.lastName;
   const dispatch = useDispatch();
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
@@ -216,7 +217,7 @@ const NavBar = () => {
         {/* Right-side buttons and profile dropdown */}
         {isLoggedIn ? (
           <div className="flex items-center gap-4">
-            <div className="font-semibold text-gray-600 text-md hidden md:block">{`Hi! ${username}`}</div>
+            <div className="font-semibold text-gray-600 text-md hidden md:block">{`Hi! ${fullname}`}</div>
             <div className="flex items-center relative" ref={dropdownRef}>
               {/* Profile photo with dropdown */}
               <div

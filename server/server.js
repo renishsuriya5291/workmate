@@ -43,6 +43,6 @@ app.use("/api/proposal", proposals);
 app.use("/api/contract", contracts);
 
 // Start the server
-app.listen(port, () => {
+app.listen(port, '0.0.0.0',() => {
   console.log(`Server running on port ${port}`);
 });

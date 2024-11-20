@@ -177,12 +177,14 @@ function EditProfile() {
     setLoading(true);
 
     try {
+
       const response = await axios.post("/api/user/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           "X-File-Name": name,
         },
       });
+      
       if (name === "profile") {
         dispatch(setImage(response.data.imageUrl));
         setFile1(null);
@@ -860,6 +862,7 @@ function EditProfile() {
                 variant="black"
                 onClick={() => {
                   if (flie1) {
+                    
                     handleFileUpload(flie1, "profile");
                   }
                   closeModal("avatar");

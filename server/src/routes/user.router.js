@@ -6,6 +6,8 @@ const authenticateToken = require("../middleware");
 const { upload } = require("../middleware/multer");
 const { uploadCloudinary } = require("../utils/cloudniry");
 const fs = require("fs");
+const multer = require("multer");
+
 
 router.get("/", UserController.getUser);
 router.put("/update", authenticateToken, UserController.update);
